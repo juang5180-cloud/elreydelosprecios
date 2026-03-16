@@ -329,15 +329,10 @@ main{max-width:1100px;margin:0 auto;padding:20px 16px}
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPA_URL='https://kgidvnrcwoitdmkpmfhq.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnaWR2bnJjd29pdGRta3BtZmhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MjM1NzMsImV4cCI6MjA4OTA5OTU3M30.uenYN7brtCv7OLHSnfi4ymbOJTiatHYuxI4hmYilUTo';
-const HEADS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
-const ADMIN_PATH='#/Admin-ELRDLP';
-
-async function dbGet(){const r=await fetch(`${SUPA_URL}/rest/v1/products?order=id.asc`,{headers:HEADS});return r.ok?r.json():[];}
-async function dbInsert(p){const r=await fetch(`${SUPA_URL}/rest/v1/products`,{method:'POST',headers:{...HEADS,'Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok?(await r.json())[0]:null;}
-async function dbUpdate(id,p){const r=await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${id}`,{method:'PATCH',headers:{...HEADS,'Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok;}
-async function dbDelete(id){const r=await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${id}`,{method:'DELETE',headers:HEADS});return r.ok;}
+async function dbGet(){const r=await fetch(`/api/products?order=id.asc`);return r.ok?r.json():[];}
+async function dbInsert(p){const r=await fetch(`/api/products`,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok?(await r.json())[0]:null;}
+async function dbUpdate(id,p){const r=await fetch(`/api/products?id=eq.${id}`,{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok;}
+async function dbDelete(id){const r=await fetch(`/api/products?id=eq.${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'}});return r.ok;}
 
 let authToken=sessionStorage.getItem('rey_token')||null;
 async function doLogin(){
@@ -345,7 +340,7 @@ async function doLogin(){
   const pass=document.getElementById('loginPass').value.trim();
   document.getElementById('loginErr').style.display='none';
   try{
-    const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY},body:JSON.stringify({email,password:pass})});
+    const r=await fetch(`/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
     const d=await r.json();
     if(d.access_token){authToken=d.access_token;sessionStorage.setItem('rey_token',authToken);showAdminPage();}
     else document.getElementById('loginErr').style.display='block';
