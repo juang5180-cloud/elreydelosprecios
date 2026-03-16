@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Rey de los Precios</title>
+<meta name="application-name" content="El Rey de los Precios">
+<meta name="apple-mobile-web-app-title" content="El Rey de los Precios">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#E31E24">
+<link rel="apple-touch-icon" href="https://i.imgur.com/iPNP6U2.jpeg">
+<link rel="icon" type="image/jpeg" href="https://i.imgur.com/iPNP6U2.jpeg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+:root{--red:#E31E24;--dark:#1a1a1a;--gray:#f5f5f5;--gray2:#e0e0e0;--text:#222}
+body{background:#f5f5f5;color:var(--text)}
+
+header{background:var(--red);padding:0 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
+.logo-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:3px solid #fff;flex-shrink:0}
+.search-bar{flex:1;display:flex;gap:8px;max-width:460px}
+.search-bar input{flex:1;padding:8px 14px;border:none;border-radius:6px;font-size:14px;outline:none}
+.search-bar button{background:#000;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
+.cart-btn{background:rgba(255,255,255,.15);border:2px solid #fff;color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
+.cart-count{background:#000;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:900}
+.menu-btn{background:rgba(255,255,255,.15);border:2px solid #fff;color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:700;font-size:14px}
+.menu-wrapper{position:relative}
+.dropdown{position:absolute;top:64px;left:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:200px;z-index:200;overflow:hidden;display:none}
+.dropdown.open{display:block}
+.dropdown-item{display:flex;align-items:center;gap:10px;padding:13px 18px;font-weight:700;font-size:14px;cursor:pointer;color:var(--text);border:none;background:none;width:100%;text-align:left;transition:.15s}
+.dropdown-item:hover{background:var(--gray);color:var(--red)}
+.dropdown-item.active{color:var(--red)}
+.dropdown-divider{height:1px;background:var(--gray2)}
+
+.delivery-info{background:var(--dark);color:#fff;text-align:center;padding:8px;font-size:13px;font-weight:600}
+.delivery-info span{color:#FFD700}
+.banner{background:var(--dark);color:#fff;text-align:center;padding:28px 16px;position:relative;overflow:hidden}
+.banner::before{content:'';position:absolute;left:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:var(--red);opacity:.15}
+.banner::after{content:'';position:absolute;right:-40px;bottom:-40px;width:160px;height:160px;border-radius:50%;background:var(--red);opacity:.1}
+.banner h1{font-size:clamp(22px,5vw,42px);font-weight:900;text-transform:uppercase}
+.banner h1 span{color:var(--red)}
+.banner p{font-size:clamp(14px,3vw,18px);margin-top:6px;color:#ccc}
+.badge-banner{display:inline-block;background:var(--red);color:#fff;font-weight:900;font-size:clamp(15px,3vw,22px);padding:8px 24px;border-radius:30px;margin-top:12px}
+
+.cats{background:#fff;border-bottom:1px solid var(--gray2);overflow-x:auto;white-space:nowrap;padding:0 16px}
+.cats-inner{max-width:1100px;margin:0 auto;display:flex;gap:4px;padding:10px 0}
+.cat-btn{background:none;border:2px solid var(--gray2);color:var(--text);padding:7px 14px;border-radius:20px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap;transition:.2s}
+.cat-btn:hover,.cat-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+
+main{max-width:1100px;margin:0 auto;padding:20px 16px}
+.section-title{font-size:18px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:10px;text-transform:uppercase}
+.section-title::after{content:'';flex:1;height:3px;background:var(--red);border-radius:2px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;margin-bottom:32px}
+.card{background:#fff;border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s;border:1px solid var(--gray2);position:relative}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.card-img{width:100%;height:130px;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:40px}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-body{padding:10px}
+.card-name{font-size:13px;font-weight:600;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.card-price{font-size:17px;font-weight:900;color:var(--red)}
+.card-add{width:100%;background:var(--red);color:#fff;border:none;padding:8px;font-weight:700;font-size:13px;cursor:pointer}
+.card-add:hover{background:#b01a1e}
+.badge-new{position:absolute;top:8px;left:8px;background:#000;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px}
+.badge-hot{position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px}
+
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none}
+.cart-panel{position:fixed;right:0;top:0;bottom:0;width:min(360px,100vw);background:#fff;z-index:300;display:flex;flex-direction:column;transform:translateX(100%);transition:.3s}
+.cart-panel.open{transform:translateX(0)}
+.cart-overlay.open{display:block}
+.cart-header{background:var(--red);color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.cart-header h2{font-size:18px;font-weight:900}
+.cart-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.cart-items{flex:1;overflow-y:auto;padding:16px}
+.cart-empty{text-align:center;color:#999;padding:40px 16px}
+.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray2)}
+.cart-item-icon{width:44px;height:44px;border-radius:8px;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0}
+.cart-item-icon img{width:100%;height:100%;object-fit:cover}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:13px;font-weight:600}
+.cart-item-price{font-size:14px;color:var(--red);font-weight:700}
+.cart-item-qty{display:flex;align-items:center;gap:8px;margin-top:4px}
+.qty-btn{width:24px;height:24px;border:1px solid var(--gray2);background:#fff;cursor:pointer;border-radius:4px;font-weight:700}
+.qty-val{font-size:13px;font-weight:700;min-width:16px;text-align:center}
+.cart-remove{background:none;border:none;color:#999;cursor:pointer;font-size:16px}
+.cart-footer{padding:16px;border-top:2px solid var(--gray2)}
+.cart-total{display:flex;justify-content:space-between;font-size:18px;font-weight:900;margin-bottom:14px}
+.cart-total span:last-child{color:var(--red)}
+.checkout-btn{width:100%;background:var(--red);color:#fff;border:none;padding:14px;font-size:16px;font-weight:900;border-radius:8px;cursor:pointer;text-transform:uppercase}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:460px;overflow:hidden;max-height:90vh;display:flex;flex-direction:column}
+.modal-header{background:var(--red);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.modal-header h2{font-size:18px;font-weight:900}
+.modal-body{padding:20px;overflow-y:auto}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:#555}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--gray2);border-radius:7px;font-size:14px;outline:none;color:var(--text)}
+.form-group input:focus,.form-group select:focus{border-color:var(--red)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.delivery-options{display:flex;gap:10px;margin-bottom:14px}
+.delivery-opt{flex:1;border:2px solid var(--gray2);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:.2s}
+.delivery-opt.selected{border-color:var(--red);background:#fff0f0}
+.delivery-opt .icon{font-size:22px;margin-bottom:4px}
+.delivery-opt .label{font-size:12px;font-weight:700}
+.order-summary{background:var(--gray);border-radius:8px;padding:14px;margin-bottom:16px}
+.order-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.order-row.total{font-weight:900;font-size:16px;border-top:1px solid var(--gray2);padding-top:8px;margin-top:4px}
+.order-row.total span:last-child{color:var(--red)}
+.confirm-btn{width:100%;background:var(--red);color:#fff;border:none;padding:14px;font-size:16px;font-weight:900;border-radius:8px;cursor:pointer;text-transform:uppercase}
+.success-state{text-align:center;padding:30px 20px}
+.success-icon{font-size:56px;margin-bottom:12px}
+.success-state h3{font-size:22px;font-weight:900;margin-bottom:8px}
+.success-state p{color:#666;font-size:14px;line-height:1.6}
+
+.admin-panel{background:#fff;border-radius:14px;border:2px solid var(--red);padding:20px;margin-bottom:28px}
+.admin-panel h2{font-size:17px;font-weight:900;margin-bottom:16px;color:var(--red)}
+.admin-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px}
+.admin-form input,.admin-form select{padding:9px 12px;border:1px solid var(--gray2);border-radius:7px;font-size:14px;outline:none;width:100%}
+.img-upload{border:2px dashed var(--gray2);border-radius:7px;padding:12px;text-align:center;cursor:pointer;position:relative;font-size:13px;color:#888}
+.img-upload:hover{border-color:var(--red);color:var(--red)}
+.img-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-preview{width:60px;height:60px;border-radius:8px;object-fit:cover;margin:0 auto 6px;display:block}
+.admin-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-add{background:var(--red);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+.btn-clear{background:#fff;color:#888;border:1px solid var(--gray2);padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+.product-list{margin-top:20px}
+.product-list-title{font-size:14px;font-weight:700;margin-bottom:10px;color:#555}
+.prod-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray2)}
+.prod-row-img{width:40px;height:40px;border-radius:7px;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+.prod-row-img img{width:100%;height:100%;object-fit:cover}
+.prod-row-info{flex:1;min-width:0}
+.prod-row-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod-row-price{font-size:12px;color:var(--red);font-weight:700}
+.prod-row-cat{font-size:11px;color:#999}
+.btn-edit{background:#f0f0f0;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.btn-del{background:#fff0f0;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;color:var(--red)}
+.admin-topbar{background:#1a1a1a;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.admin-topbar span{font-weight:700;color:#FFD700}
+.logout-btn{background:var(--red);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px}
+
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark);padding:16px}
+.login-box{background:#fff;border-radius:16px;padding:36px 32px;width:100%;max-width:380px;text-align:center}
+.login-box h2{font-size:20px;font-weight:900;margin-bottom:4px}
+.login-box p{font-size:13px;color:#888;margin-bottom:24px}
+.login-field{width:100%;padding:12px 14px;border:1.5px solid var(--gray2);border-radius:8px;font-size:14px;outline:none;margin-bottom:12px;color:var(--text)}
+.login-field:focus{border-color:var(--red)}
+.login-btn{width:100%;background:var(--red);color:#fff;border:none;padding:13px;border-radius:8px;font-weight:900;font-size:15px;cursor:pointer;text-transform:uppercase}
+.login-err{color:var(--red);font-size:13px;margin-bottom:10px;display:none}
+
+.social-card{background:var(--sc,#333);border-radius:12px;padding:20px 16px;text-align:center;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;transition:.2s}
+.social-card:hover{opacity:.88;transform:translateY(-2px)}
+.social-icon{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.social-name{font-weight:900;font-size:15px;color:#fff}
+.social-user{font-size:12px;color:rgba(255,255,255,.85)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#000;color:#fff;padding:12px 24px;border-radius:30px;font-weight:700;font-size:14px;z-index:500;transition:.3s;opacity:0}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" style="display:none">
+  <div class="login-page">
+    <div class="login-box">
+      <img src="https://i.imgur.com/jUnx9tM.jpeg" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:4px solid var(--red);margin-bottom:16px">
+      <h2>Panel Administrador</h2>
+      <p>Acceso exclusivo para el equipo 👑</p>
+      <div class="login-err" id="loginErr">Usuario o contraseña incorrectos</div>
+      <input class="login-field" type="email" id="loginEmail" placeholder="Correo electrónico">
+      <input class="login-field" type="password" id="loginPass" placeholder="Contraseña">
+      <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIENDA CLIENTES -->
+<div id="storePage" style="display:none">
+  <div class="delivery-info">Recogida en tienda o <span>domicilio disponible</span> | Cali, Colombia</div>
+  <header>
+    <div class="header-inner">
+      <div class="menu-wrapper">
+        <button class="menu-btn" onclick="toggleMenu()">☰ Menú</button>
+        <div class="dropdown" id="dropdownMenu">
+          <button class="dropdown-item active" id="menu-shop" onclick="showView('shop')">🛒 Productos</button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" id="menu-contact" onclick="showView('contact')">📍 Contacto</button>
+        </div>
+      </div>
+      <img src="https://i.ibb.co/LhHDs4m9/Whats-App-Image-2026-03-14-at-1-19-20-PM.jpg" class="logo-img">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar producto..." oninput="renderProducts()">
+        <button onclick="renderProducts()">Buscar</button>
+      </div>
+      <button class="cart-btn" onclick="toggleCart()">🛒 <span class="cart-count" id="cartCount">0</span></button>
+    </div>
+  </header>
+  <div class="banner">
+    <h1>¡El <span>Rey</span> de los Precios!</h1>
+    <p>Los mejores precios de Cali, todo en un solo lugar</p>
+    <div class="badge-banner">¡Todo desde $5.000 hasta $20.000!</div>
+  </div>
+  <div class="cats" id="catsBar">
+    <div class="cats-inner" id="catsInner"></div>
+  </div>
+  <main>
+    <div id="shopView">
+      <div class="section-title">🔥 Ofertas del Día</div>
+      <div class="grid" id="productGrid"></div>
+    </div>
+    <div id="contactView" style="display:none">
+      <div class="section-title">📱 Nuestras Redes</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:32px">
+        <a href="https://wa.me/573217094252" target="_blank" class="social-card" style="--sc:#25D366">
+          <div class="social-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.072 23.927a.5.5 0 00.607.607l6.087-1.457A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-4.99-1.365l-.358-.213-3.716.889.904-3.609-.234-.371A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
+          <div class="social-name">WhatsApp</div><div class="social-user">+57 321 709 4252</div>
+        </a>
+        <a href="https://www.tiktok.com/@elrey_delosprecios" target="_blank" class="social-card" style="--sc:#000">
+          <div class="social-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg></div>
+          <div class="social-name">TikTok</div><div class="social-user">@elrey_delosprecios</div>
+        </a>
+        <a href="https://www.instagram.com/elrey.delosprecios" target="_blank" class="social-card" style="--sc:#E1306C">
+          <div class="social-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>
+          <div class="social-name">Instagram</div><div class="social-user">@elrey.delosprecios</div>
+        </a>
+        <a href="https://www.facebook.com/search/top?q=Rey%20Precios%20Bajos" target="_blank" class="social-card" style="--sc:#1877F2">
+          <div class="social-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg></div>
+          <div class="social-name">Facebook</div><div class="social-user">Rey Precios Bajos</div>
+        </a>
+      </div>
+      <div class="section-title">🎵 Nuestros TikToks</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px">
+        <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray2)"><blockquote class="tiktok-embed" cite="https://vt.tiktok.com/ZSua8FDxP/" data-video-id="ZSua8FDxP" style="max-width:100%;min-width:0"><a href="https://vt.tiktok.com/ZSua8FDxP/">Ver en TikTok</a></blockquote></div>
+        <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray2)"><blockquote class="tiktok-embed" cite="https://vt.tiktok.com/ZSua8Yw6E/" data-video-id="ZSua8Yw6E" style="max-width:100%;min-width:0"><a href="https://vt.tiktok.com/ZSua8Yw6E/">Ver en TikTok</a></blockquote></div>
+        <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray2)"><blockquote class="tiktok-embed" cite="https://vt.tiktok.com/ZSua8AKMj/" data-video-id="ZSua8AKMj" style="max-width:100%;min-width:0"><a href="https://vt.tiktok.com/ZSua8AKMj/">Ver en TikTok</a></blockquote></div>
+      </div>
+      <script async src="https://www.tiktok.com/embed.js"></script>
+      <div class="section-title">🗺️ Cómo Llegar</div>
+      <div style="background:#fff;border-radius:12px;border:1px solid var(--gray2);overflow:hidden;margin-bottom:24px">
+        <iframe src="https://www.google.com/maps?q=Calle+15+%238-80,+Cali,+Colombia&output=embed" width="100%" height="260" style="border:0;display:block" allowfullscreen loading="lazy"></iframe>
+        <div style="padding:16px;display:flex;flex-wrap:wrap;gap:16px">
+          <div style="flex:1;min-width:160px"><p style="font-weight:900;font-size:14px;margin-bottom:6px">📍 Dirección</p><p style="color:#555;font-size:13px;line-height:1.6">Calle 15 #8-80<br>Cali, Valle del Cauca</p></div>
+          <div style="flex:1;min-width:160px"><p style="font-weight:900;font-size:14px;margin-bottom:6px">🕐 Horario</p><p style="color:#555;font-size:13px;line-height:1.6">Lunes a Sábado: 8:30am – 7:00pm<br>Domingos y Festivos: 9:00am – 2:00pm</p></div>
+          <div style="flex:1;min-width:160px"><p style="font-weight:900;font-size:14px;margin-bottom:6px">📞 Teléfono</p><p style="color:#555;font-size:13px;line-height:1.6">+57 321 709 4252<br>WhatsApp disponible</p></div>
+        </div>
+        <div style="padding:0 16px 16px"><a href="https://www.google.com/maps/dir/?api=1&destination=Calle+15+%238-80,+Cali,+Colombia" target="_blank" style="display:inline-block;background:var(--red);color:#fff;padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none">Abrir en Google Maps →</a></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header"><h2>🛒 Mi Carrito</h2><button class="cart-close" onclick="toggleCart()">✕</button></div>
+    <div class="cart-items" id="cartItems"><div class="cart-empty">Tu carrito está vacío</div></div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Total:</span><span id="cartTotal">$0</span></div>
+      <button class="checkout-btn" onclick="openCheckout()">Finalizar Pedido 👑</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal">
+      <div class="modal-header"><h2>👑 Finalizar Pedido</h2><button class="cart-close" onclick="closeCheckout()">✕</button></div>
+      <div class="modal-body" id="checkoutBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="catModal">
+    <div class="modal">
+      <div class="modal-header"><h2>⚙️ Gestionar Categorías</h2><button class="cart-close" onclick="closeCatModal()">✕</button></div>
+      <div class="modal-body">
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <input id="newCatName" type="text" placeholder="Nombre nueva categoría" style="flex:1;padding:9px 12px;border:1px solid var(--gray2);border-radius:7px;font-size:14px;outline:none">
+          <input id="newCatIcon" type="text" placeholder="Emoji" style="width:60px;padding:9px 8px;border:1px solid var(--gray2);border-radius:7px;font-size:18px;text-align:center;outline:none">
+          <button onclick="addCat()" style="background:var(--red);color:#fff;border:none;padding:9px 16px;border-radius:7px;font-weight:700;cursor:pointer">+ Agregar</button>
+        </div>
+        <div id="catList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminPage" style="display:none">
+  <div class="admin-topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="https://i.imgur.com/jUnx9tM.jpeg" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #FFD700">
+      <span>Panel Administrador — El Rey de los Precios</span>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+  <header>
+    <div class="header-inner">
+      <img src="https://i.imgur.com/jUnx9tM.jpeg" class="logo-img">
+      <span style="color:#fff;font-weight:900;font-size:16px;flex:1">⚙️ Panel Administrador</span>
+    </div>
+  </header>
+  <main>
+    <div class="admin-panel">
+      <h2>⚙️ Gestionar Productos</h2>
+      <div class="admin-form">
+        <input type="text" id="aName" placeholder="Nombre del producto">
+        <input type="number" id="aPrice" placeholder="Precio (ej: 12000)" min="5000" max="20000">
+        <select id="aCat"><option value="">Categoría...</option></select>
+        <select id="aBadge">
+          <option value="">Sin etiqueta</option>
+          <option value="new">NUEVO</option>
+          <option value="hot">POPULAR</option>
+        </select>
+        <div class="img-upload">
+          <input type="file" accept="image/*" id="aImg" onchange="previewImg(this)">
+          <div id="imgPreviewWrap">📷<br>Subir foto</div>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn-add" onclick="saveProduct()">✅ Guardar Producto</button>
+        <button class="btn-clear" onclick="clearForm()">✕ Limpiar</button>
+        <button class="btn-clear" style="border-color:var(--red);color:var(--red)" onclick="openCatModal()">+ Agregar categoría</button>
+      </div>
+      <div class="product-list">
+        <div class="product-list-title">📦 Productos en tienda (<span id="prodCount">0</span>)</div>
+        <div id="prodList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL='https://kgidvnrcwoitdmkpmfhq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnaWR2bnJjd29pdGRta3BtZmhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MjM1NzMsImV4cCI6MjA4OTA5OTU3M30.uenYN7brtCv7OLHSnfi4ymbOJTiatHYuxI4hmYilUTo';
+const HEADS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+const ADMIN_PATH='#/Admin-ELRDLP';
+
+async function dbGet(){const r=await fetch(`${SUPA_URL}/rest/v1/products?order=id.asc`,{headers:HEADS});return r.ok?r.json():[];}
+async function dbInsert(p){const r=await fetch(`${SUPA_URL}/rest/v1/products`,{method:'POST',headers:{...HEADS,'Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok?(await r.json())[0]:null;}
+async function dbUpdate(id,p){const r=await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${id}`,{method:'PATCH',headers:{...HEADS,'Prefer':'return=representation'},body:JSON.stringify(p)});return r.ok;}
+async function dbDelete(id){const r=await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${id}`,{method:'DELETE',headers:HEADS});return r.ok;}
+
+let authToken=sessionStorage.getItem('rey_token')||null;
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value.trim();
+  document.getElementById('loginErr').style.display='none';
+  try{
+    const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY},body:JSON.stringify({email,password:pass})});
+    const d=await r.json();
+    if(d.access_token){authToken=d.access_token;sessionStorage.setItem('rey_token',authToken);showAdminPage();}
+    else document.getElementById('loginErr').style.display='block';
+  }catch(e){document.getElementById('loginErr').style.display='block';}
+}
+function doLogout(){authToken=null;sessionStorage.removeItem('rey_token');window.location.hash='';router();}
+
+function router(){
+  const hash=window.location.hash;
+  if(hash===ADMIN_PATH){authToken?showAdminPage():showLoginPage();}
+  else showStorePage();
+}
+function showLoginPage(){document.getElementById('loginPage').style.display='block';document.getElementById('storePage').style.display='none';document.getElementById('adminPage').style.display='none';}
+function showStorePage(){document.getElementById('loginPage').style.display='none';document.getElementById('storePage').style.display='block';document.getElementById('adminPage').style.display='none';}
+async function showAdminPage(){document.getElementById('loginPage').style.display='none';document.getElementById('storePage').style.display='none';document.getElementById('adminPage').style.display='block';products=await dbGet();renderAdminList();}
+window.addEventListener('hashchange',router);
+
+let customCats=JSON.parse(localStorage.getItem('rey_cats')||'null')||{hogar:'🏠 Hogar',aseo:'🧹 Aseo',ropa:'👕 Ropa',sabanas:'🛏️ Sábanas',calzado:'👟 Calzado',juguetes:'🧸 Juguetes',iluminacion:'💡 Iluminación'};
+function saveCats(){localStorage.setItem('rey_cats',JSON.stringify(customCats));}
+function renderCats(){
+  const ci=document.getElementById('catsInner');
+  ci.innerHTML=`<button class="cat-btn${currentCat==='todos'?' active':''}" onclick="filterCat('todos')">Todos</button>`
+    +Object.entries(customCats).map(([k,v])=>`<button class="cat-btn${currentCat===k?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
+}
+function filterCat(cat){currentCat=cat;renderCats();renderProducts();}
+function openCatModal(){renderCatList();document.getElementById('catModal').classList.add('open');}
+function closeCatModal(){document.getElementById('catModal').classList.remove('open');renderCats();renderAdminCatOptions();}
+function renderCatList(){
+  document.getElementById('catList').innerHTML=Object.entries(customCats).map(([k,v])=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray2)">
+      <span style="font-size:18px;width:28px;text-align:center">${v.split(' ')[0]}</span>
+      <span style="flex:1;font-size:14px;font-weight:600">${v.split(' ').slice(1).join(' ')||v}</span>
+      <button onclick="deleteCat('${k}')" style="background:#fff0f0;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;color:var(--red)">🗑️ Eliminar</button>
+    </div>`).join('');
+}
+function addCat(){
+  const name=document.getElementById('newCatName').value.trim();
+  const icon=document.getElementById('newCatIcon').value.trim();
+  if(!name){showToast('⚠️ Escribe el nombre');return;}
+  const key=name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if(customCats[key]){showToast('⚠️ Ya existe esa categoría');return;}
+  customCats[key]=(icon||'📦')+' '+name;
+  saveCats();
+  document.getElementById('newCatName').value='';
+  document.getElementById('newCatIcon').value='';
+  renderCatList();
+  showToast('✅ Categoría agregada');
+}
+function deleteCat(key){
+  if(products.filter(p=>p.cat===key).length>0){showToast('⚠️ Hay productos en esta categoría');return;}
+  if(!confirm('¿Eliminar esta categoría?'))return;
+  delete customCats[key];saveCats();
+  if(currentCat===key)currentCat='todos';
+  renderCatList();showToast('🗑️ Categoría eliminada');
+}
+function renderAdminCatOptions(){
+  const sel=document.getElementById('aCat');if(!sel)return;
+  sel.innerHTML='<option value="">Categoría...</option>'+Object.entries(customCats).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+}
+
+let products=[],currentCat='todos',editingId=null,pendingImg='',nextId=null;
+function fmt(n){return '$'+Number(n).toLocaleString('es-CO');}
+
+function renderProducts(){
+  const term=document.getElementById('searchInput').value.toLowerCase();
+  const grid=document.getElementById('productGrid');
+  const filtered=products.filter(p=>(currentCat==='todos'||p.cat===currentCat)&&p.name.toLowerCase().includes(term));
+  if(!filtered.length){grid.innerHTML='<p style="color:#999;grid-column:1/-1;text-align:center;padding:40px">No se encontraron productos</p>';return;}
+  grid.innerHTML=filtered.map(p=>`
+    <div class="card" onclick="addToCart(${p.id})">
+      ${p.badge==='new'?'<div class="badge-new">NUEVO</div>':''}
+      ${p.badge==='hot'?'<div class="badge-hot">🔥 POPULAR</div>':''}
+      <div class="card-img">${p.img?`<img src="${p.img}" alt="${p.name}">`:(p.icon||'📦')}</div>
+      <div class="card-body"><div class="card-name">${p.name}</div><div class="card-price">${fmt(p.price)}</div></div>
+      <button class="card-add">+ Agregar al carrito</button>
+    </div>`).join('');
+}
+
+function renderAdminList(){
+  document.getElementById('prodCount').textContent=products.length;
+  renderAdminCatOptions();
+  document.getElementById('prodList').innerHTML=products.map(p=>`
+    <div class="prod-row">
+      <div class="prod-row-img">${p.img?`<img src="${p.img}">`:(p.icon||'📦')}</div>
+      <div class="prod-row-info">
+        <div class="prod-row-name">${p.name}</div>
+        <div class="prod-row-price">${fmt(p.price)}</div>
+        <div class="prod-row-cat">${customCats[p.cat]||p.cat}</div>
+      </div>
+      <button class="btn-edit" onclick="editProduct(${p.id})">✏️ Editar</button>
+      <button class="btn-del" onclick="deleteProduct(${p.id})">🗑️</button>
+    </div>`).join('');
+}
+
+function previewImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{pendingImg=e.target.result;document.getElementById('imgPreviewWrap').innerHTML=`<img class="img-preview" src="${pendingImg}"><br>Cambiar foto`;};
+  reader.readAsDataURL(file);
+}
+async function saveProduct(){
+  const name=document.getElementById('aName').value.trim();
+  const price=parseInt(document.getElementById('aPrice').value);
+  const cat=document.getElementById('aCat').value;
+  const badge=document.getElementById('aBadge').value;
+  if(!name||!price||!cat){showToast('⚠️ Completa nombre, precio y categoría');return;}
+  if(price<5000||price>20000){showToast('⚠️ Precio entre $5.000 y $20.000');return;}
+  const icons={hogar:'🏠',aseo:'🧹',ropa:'👕',sabanas:'🛏️',calzado:'👟',juguetes:'🧸',iluminacion:'💡'};
+  const payload={name,price,cat,badge,icon:icons[cat]||'📦',img:pendingImg||''};
+  document.querySelector('.btn-add').textContent='⏳ Guardando...';
+  if(editingId){await dbUpdate(editingId,payload);showToast('✅ Producto actualizado');editingId=null;}
+  else{await dbInsert(payload);showToast('✅ Producto agregado');}
+  clearForm();products=await dbGet();renderAdminList();
+}
+function editProduct(id){
+  const p=products.find(x=>x.id===id);editingId=id;
+  document.getElementById('aName').value=p.name;
+  document.getElementById('aPrice').value=p.price;
+  document.getElementById('aCat').value=p.cat;
+  document.getElementById('aBadge').value=p.badge;
+  pendingImg=p.img||'';
+  document.getElementById('imgPreviewWrap').innerHTML=p.img?`<img class="img-preview" src="${p.img}"><br>Cambiar foto`:'📷<br>Subir foto';
+  document.querySelector('.btn-add').textContent='💾 Actualizar Producto';
+}
+async function deleteProduct(id){
+  if(!confirm('¿Eliminar este producto?'))return;
+  await dbDelete(id);products=products.filter(x=>x.id!==id);renderAdminList();showToast('🗑️ Producto eliminado');
+}
+function clearForm(){
+  editingId=null;pendingImg='';
+  ['aName','aPrice'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('aCat').value='';document.getElementById('aBadge').value='';
+  document.getElementById('imgPreviewWrap').innerHTML='📷<br>Subir foto';
+  document.querySelector('.btn-add').textContent='✅ Guardar Producto';
+}
+
+function showView(v){
+  document.getElementById('shopView').style.display=v==='shop'?'block':'none';
+  document.getElementById('contactView').style.display=v==='contact'?'block':'none';
+  ['shop','contact'].forEach(x=>{const el=document.getElementById('menu-'+x);if(el)el.classList.toggle('active',x===v);});
+  closeMenu();
+}
+function toggleMenu(){document.getElementById('dropdownMenu').classList.toggle('open');}
+function closeMenu(){document.getElementById('dropdownMenu').classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrapper'))closeMenu();});
+
+let cart=[];
+function addToCart(id){
+  const p=products.find(x=>x.id===id);
+  const ex=cart.find(x=>x.id===id);
+  if(ex)ex.qty++;else cart.push({...p,qty:1});
+  updateCart();showToast('✅ '+p.name+' agregado');
+}
+function updateCart(){
+  const count=cart.reduce((a,c)=>a+c.qty,0);
+  document.getElementById('cartCount').textContent=count;
+  document.getElementById('cartTotal').textContent=fmt(cart.reduce((a,c)=>a+c.price*c.qty,0));
+  const el=document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML='<div class="cart-empty">Tu carrito está vacío</div>';return;}
+  el.innerHTML=cart.map(c=>`
+    <div class="cart-item">
+      <div class="cart-item-icon">${c.img?`<img src="${c.img}">`:(c.icon||'📦')}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">${fmt(c.price)}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeQty(${c.id},-1)">-</button>
+          <span class="qty-val">${c.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${c.id},1)">+</button>
+          <button class="cart-remove" onclick="removeItem(${c.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function changeQty(id,d){const i=cart.find(x=>x.id===id);i.qty+=d;if(i.qty<=0)cart=cart.filter(x=>x.id!==id);updateCart();}
+function removeItem(id){cart=cart.filter(x=>x.id!==id);updateCart();}
+function toggleCart(){document.getElementById('cartPanel').classList.toggle('open');document.getElementById('cartOverlay').classList.toggle('open');}
+
+let deliveryMode='tienda';
+function openCheckout(){
+  if(!cart.length){showToast('⚠️ Agrega productos primero');return;}
+  const total=cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const rows=cart.map(c=>`<div class="order-row"><span>${c.icon||'📦'} ${c.name} x${c.qty}</span><span>${fmt(c.price*c.qty)}</span></div>`).join('');
+  document.getElementById('checkoutBody').innerHTML=`
+    <div class="order-summary">${rows}<div class="order-row total"><span>TOTAL</span><span>${fmt(total)}</span></div></div>
+    <p style="font-size:13px;font-weight:700;margin-bottom:8px;color:#555">MÉTODO DE ENTREGA</p>
+    <div class="delivery-options">
+      <div class="delivery-opt selected" id="opt-tienda" onclick="selDel('tienda')"><div class="icon">🏪</div><div class="label">Recogida en tienda</div></div>
+      <div class="delivery-opt" id="opt-domicilio" onclick="selDel('domicilio')"><div class="icon">🚚</div><div class="label">Domicilio</div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input id="fNombre" type="text" placeholder="Tu nombre"></div>
+      <div class="form-group"><label>Teléfono</label><input id="fTel" type="tel" placeholder="300 000 0000"></div>
+    </div>
+    <div class="form-group" id="addressGroup" style="display:none"><label>Dirección</label><input id="fDir" type="text" placeholder="Calle, barrio, ciudad"></div>
+    <div class="form-group"><label>Notas (opcional)</label><textarea id="fNota" rows="2"></textarea></div>
+    <button class="confirm-btn" onclick="confirmOrder()">CONFIRMAR PEDIDO 🎉</button>`;
+  deliveryMode='tienda';
+  document.getElementById('checkoutModal').classList.add('open');
+  toggleCart();
+}
+function selDel(m){
+  deliveryMode=m;
+  document.getElementById('opt-tienda').classList.toggle('selected',m==='tienda');
+  document.getElementById('opt-domicilio').classList.toggle('selected',m==='domicilio');
+  document.getElementById('addressGroup').style.display=m==='domicilio'?'block':'none';
+}
+function closeCheckout(){document.getElementById('checkoutModal').classList.remove('open');}
+function confirmOrder(){
+  const nombre=document.getElementById('fNombre').value.trim();
+  const tel=document.getElementById('fTel').value.trim();
+  const dir=document.getElementById('fDir')?document.getElementById('fDir').value.trim():'';
+  const nota=document.getElementById('fNota').value.trim();
+  if(!nombre||!tel){showToast('⚠️ Nombre y teléfono son requeridos');return;}
+  if(deliveryMode==='domicilio'&&!dir){showToast('⚠️ Ingresa tu dirección');return;}
+  const total=cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const items=cart.map(c=>`• ${c.icon||'📦'} ${c.name} x${c.qty} = ${fmt(c.price*c.qty)}`).join('\n');
+  const msg=`👑 *NUEVO PEDIDO - El Rey de los Precios*\n\n👤 *Cliente:* ${nombre}\n📞 *Tel:* ${tel}\n📦 *Entrega:* ${deliveryMode==='tienda'?'🏪 Recogida en tienda':'🚚 Domicilio a: '+dir}\n`+(nota?`📝 *Nota:* ${nota}\n`:'')+`\n🛒 *Productos:*\n${items}\n\n💰 *TOTAL: ${fmt(total)}*`;
+  window.open('https://wa.me/573217094252?text='+encodeURIComponent(msg),'_blank');
+  document.getElementById('checkoutBody').innerHTML=`
+    <div class="success-state">
+      <div class="success-icon">👑</div>
+      <h3>¡Pedido Enviado!</h3>
+      <p>Gracias <strong>${nombre}</strong>, tu pedido fue enviado por WhatsApp.<br><br>
+      ${deliveryMode==='tienda'?'Puedes pasar a recogerlo en nuestra tienda.':'Nos contactaremos al <strong>'+tel+'</strong> para coordinar el domicilio.'}<br><br>
+      <span style="color:var(--red);font-weight:700">¡Aquí siempre ganas!</span></p>
+      <button style="background:var(--red);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-weight:900;cursor:pointer;margin-top:16px" onclick="closeCheckout();cart=[];updateCart();">Seguir Comprando</button>
+    </div>`;
+  cart=[];updateCart();
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+async function init(){
+  router();
+  if(window.location.hash!==ADMIN_PATH){
+    document.getElementById('productGrid').innerHTML='<p style="color:#999;grid-column:1/-1;text-align:center;padding:40px">⏳ Cargando productos...</p>';
+    try{products=await dbGet();}catch(e){products=[];}
+    renderCats();renderProducts();
+  }
+}
+init();
+</script>
+</body>
+</html>
