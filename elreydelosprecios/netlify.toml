@@ -1,7 +1,6 @@
 [build]
-  base = "elreydelosprecios"
-  publish = "."
-  functions = "netlify/functions"
+  publish = "elreydelosprecios"
+  functions = "elreydelosprecios/netlify/functions"
 
 [[redirects]]
   from = "/api/*"
